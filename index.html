@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireframe ระบบนักศึกษา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 80%;
+            max-height: 80%;
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+        @keyframes zoom {
+            from {transform: scale(0)}
+            to {transform: scale(1)}
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="min-h-screen flex flex-col">
+
+        <!-- Header: Top navigation bar -->
+        <header class="bg-white shadow-md p-4 flex justify-between items-center rounded-b-xl sticky top-0 z-50">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-900">ระบบจัดการสำหรับนักศึกษา</h1>
+            <div class="flex items-center space-x-2">
+                <span class="text-sm font-medium hidden sm:inline">นาย จักริน เถาว์ชาลี</span>
+                <img id="myImg" class="w-8 h-8 rounded-full object-cover cursor-pointer" src="https://i.postimg.cc/BbfmCBth/DD.jpg" alt="รูปโปรไฟล์">
+            </div>
+        </header>
+
+        <!-- Main Content: Sidebar and main area -->
+        <div class="flex flex-1 flex-col md:flex-row">
+
+            <!-- Sidebar: Navigation menu -->
+            <nav class="bg-white shadow-lg p-4 md:w-64 rounded-b-xl md:rounded-r-xl md:rounded-b-none mb-4 md:mb-0 md:mr-4">
+                <ul class="space-y-2">
+                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors" data-section="profile">ข้อมูลส่วนตัว</a></li>
+                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors" data-section="results">ผลการเรียน</a></li>
+                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors" data-section="payments">การชำระเงิน</a></li>
+                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors" data-section="activities">กิจกรรม</a></li>
+                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors" data-section="notifications">การแจ้งเตือน</a></li>
+                </ul>
+            </nav>
+
+            <!-- Main and right content areas -->
+            <main class="flex-1 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 p-4 md:p-0">
+
+                <!-- Profile content area -->
+                <div id="profile-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">ข้อมูลโปรไฟล์</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-bold text-lg mb-2 text-gray-700">ข้อมูลส่วนตัว</h3>
+                            <p class="text-sm text-gray-600">ชื่อ-นามสกุล: จักริน เถาว์ชาลี</p>
+                            <p class="text-sm text-gray-600">รหัสนักศึกษา: 681540005020-4</p>
+                            <p class="text-sm text-gray-600">คณะ: วิทยาการคอมพิวเตอร์</p>
+                            <p class="text-sm text-gray-600">เบอร์โทรศัพท์: 0970143752</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-bold text-lg mb-2 text-gray-700">ข้อมูลการศึกษา</h3>
+                            <p class="text-sm text-gray-600">ปีการศึกษา: 2567</p>
+                            <p class="text-sm text-gray-600">หน่วยกิตสะสม: 90</p>
+                            <p class="text-sm text-gray-600">เกรดเฉลี่ย: 3.31</p>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">ฟังก์ชันและเครื่องมือ</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <button class="bg-yellow-500 text-white p-4 rounded-lg shadow-md hover:bg-yellow-600 transition-colors" data-section="timetable">ดูตารางเรียน</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results content area (hidden by default) -->
+                <div id="results-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">ผลการเรียน</h2>
+                    <div class="flex justify-center">
+                       <!-- This section is left empty for future content like a transcript or grade report -->
+                    </div>
+                </div>
+
+                <!-- Timetable content area (hidden by default) -->
+                <div id="timetable-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">ตารางเรียน</h2>
+                    <div class="flex justify-center">
+                        <img src="https://i.postimg.cc/YCXkyh6N/Untitled.png" alt="ตารางเรียน" class="rounded-lg shadow-md cursor-pointer">
+                    </div>
+                </div>
+                
+                <!-- Other sections (hidden by default) -->
+                <div id="payments-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">การชำระเงิน</h2>
+                    <p class="text-gray-600">เนื้อหาเกี่ยวกับการชำระเงินจะแสดงที่นี่</p>
+                </div>
+
+                <div id="activities-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">กิจกรรม</h2>
+                    <p class="text-gray-600">เนื้อหาเกี่ยวกับกิจกรรมจะแสดงที่นี่</p>
+                </div>
+                
+                <div id="notifications-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">การแจ้งเตือน</h2>
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-red-500">
+                            <p class="font-medium text-gray-800">การชำระเงินล่าช้า: ค่าเทอมงวดที่ 2</p>
+                            <p class="text-sm text-gray-500">ครบกำหนดวันที่ 30 กันยายน 2567</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
+                            <p class="font-medium text-gray-800">กิจกรรมใหม่: สัมมนา AI และอนาคต</p>
+                            <p class="text-sm text-gray-500">ลงทะเบียนได้ตั้งแต่วันนี้!</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                            <p class="font-medium text-gray-800">โปรดอัปเดตข้อมูลที่อยู่</p>
+                            <p class="text-sm text-gray-500">ข้อมูลของคุณยังไม่สมบูรณ์</p>
+                        </div>
+                    </div>
+                </aside>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for displaying the image -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="img01">
+    </div>
+
+    <script>
+        // Get the modal
+        const modal = document.getElementById("myModal");
+        const modalImg = document.getElementById("img01");
+        const myImg = document.getElementById("myImg");
+
+        myImg.onclick = function(){
+            modal.style.display = "flex";
+            modalImg.src = this.src;
+        }
+
+        // Get the <span> element that closes the modal
+        const span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal content, close it
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+
+        // Section management
+        const sections = {
+            'profile': document.getElementById('profile-section'),
+            'results': document.getElementById('results-section'),
+            'timetable': document.getElementById('timetable-section'),
+            'payments': document.getElementById('payments-section'),
+            'activities': document.getElementById('activities-section'),
+            'notifications': document.getElementById('notifications-section')
+        };
+        const navLinks = document.querySelectorAll('nav ul li a');
+        const timetableBtn = document.querySelector('[data-section="timetable"]');
+
+        function showSection(sectionId) {
+            for (const id in sections) {
+                if (sections[id]) {
+                    if (id === sectionId) {
+                        sections[id].classList.remove('hidden');
+                    } else {
+                        sections[id].classList.add('hidden');
+                    }
+                }
+            }
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                const sectionId = this.getAttribute('data-section');
+                showSection(sectionId);
+
+                // Update active link styling
+                navLinks.forEach(l => l.classList.remove('bg-blue-50', 'text-blue-700'));
+                this.classList.add('bg-blue-50', 'text-blue-700');
+            });
+        });
+
+        // Set up the click event for the "ดูตารางเรียน" button
+        if (timetableBtn) {
+            timetableBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                showSection('timetable');
+                // Also update the active link in the sidebar
+                navLinks.forEach(l => l.classList.remove('bg-blue-50', 'text-blue-700'));
+                document.querySelector('nav ul li a[data-section="profile"]').classList.add('bg-blue-50', 'text-blue-700');
+            });
+        }
+
+        // Initially show the profile section
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('profile');
+            document.querySelector('nav ul li a[data-section="profile"]').classList.add('bg-blue-50', 'text-blue-700');
+        });
+
+        // Modal for the timetable image
+        const timetableImageInTimetableSection = document.querySelector('#timetable-section img');
+        if (timetableImageInTimetableSection) {
+            timetableImageInTimetableSection.onclick = function() {
+                modal.style.display = "flex";
+                modalImg.src = this.src;
+            };
+        }
+    </script>
+</body>
+</html>
