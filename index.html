@@ -1,257 +1,530 @@
+<!-- HTML for the dashboard -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wireframe ระบบนักศึกษา</title>
+    <title>Consumer Behavior Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
+            color: #1f2937;
+            padding: 2rem;
         }
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
+        .dashboard-container {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(1, 1fr);
+        }
+        @media (min-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .chart-container {
             width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            height: 300px;
+        }
+        .stat-box {
+            background-color: #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        h1, h2 {
+            font-weight: 700;
+            color: #111827;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .filter-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
             justify-content: center;
-            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .modal-content {
-            margin: auto;
-            display: block;
-            max-width: 80%;
-            max-height: 80%;
-            animation-name: zoom;
-            animation-duration: 0.6s;
-        }
-        @keyframes zoom {
-            from {transform: scale(0)}
-            to {transform: scale(1)}
-        }
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .close:hover,
-        .close:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
+        .filter-controls select, .filter-controls input[type="text"] {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 p-8">
 
-    <div class="min-h-screen flex flex-col">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-8">Consumer Behavior Dashboard</h1>
 
-        <!-- Header: Top navigation bar -->
-        <header class="bg-white shadow-md p-4 flex justify-between items-center rounded-b-xl sticky top-0 z-50">
-            <h1 class="text-xl md:text-2xl font-bold text-gray-900">ระบบจัดการสำหรับนักศึกษา</h1>
-            <div class="flex items-center space-x-2">
-                <span class="text-sm font-medium hidden sm:inline">นาย จักริน เถาว์ชาลี</span>
-                <img id="myImg" class="w-8 h-8 rounded-full object-cover cursor-pointer" src="https://i.postimg.cc/BbfmCBth/DD.jpg" alt="รูปโปรไฟล์">
+        <!-- Data Source and Filter Controls -->
+        <div class="filter-controls">
+            <div class="flex flex-col flex-grow">
+                <label for="google-sheet-url-input" class="text-sm font-medium text-gray-700 mb-1">Google Sheet URL (ต้องเผยแพร่เป็น CSV):</label>
+                <input type="text" id="google-sheet-url-input" placeholder="วางลิงก์ Google Sheet CSV ที่นี่..." class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vQAUgDZ2Q6yT1UvLfJLwZD_PKu6f16auRK6XeT9kBJ3zgIn4kCpOIAN66zg4MUQ751JTdhY4ZDrxhFz/pub?gid=0&single=true&output=csv" />
             </div>
-        </header>
+            <button id="load-data-button" class="mt-auto px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors">โหลดข้อมูล</button>
+        </div>
 
-        <!-- Main Content: Sidebar and main area -->
-        <div class="flex flex-1 flex-col md:flex-row">
+        <div class="filter-controls">
+            <div class="flex flex-col">
+                <label for="platform-filter" class="text-sm font-medium text-gray-700 mb-1">กรองตามแพลตฟอร์ม:</label>
+                <select id="platform-filter" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="ทั้งหมด">ทั้งหมด</option>
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label for="location-filter" class="text-sm font-medium text-gray-700 mb-1">กรองตามสถานที่:</label>
+                <select id="location-filter" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="ทั้งหมด">ทั้งหมด</option>
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label for="category-filter" class="text-sm font-medium text-gray-700 mb-1">กรองตามหมวดหมู่:</label>
+                <select id="category-filter" class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="ทั้งหมด">ทั้งหมด</option>
+                </select>
+            </div>
+        </div>
 
-            <!-- Sidebar: Navigation menu -->
-            <nav class="bg-white shadow-lg p-4 md:w-64 rounded-b-xl md:rounded-r-xl md:rounded-b-none mb-4 md:mb-0 md:mr-4">
-                <ul class="space-y-2">
-                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors" data-section="profile">ข้อมูลส่วนตัว</a></li>
-                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors" data-section="results">ผลการเรียน</a></li>
-                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors" data-section="payments">การชำระเงิน</a></li>
-                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors" data-section="activities">กิจกรรม</a></li>
-                    <li><a href="#" class="block p-3 rounded-lg text-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors" data-section="notifications">การแจ้งเตือน</a></li>
-                </ul>
-            </nav>
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center transition-transform hover:scale-105">
+                <div class="text-5xl font-bold text-blue-600" id="total-customers">0</div>
+                <div class="text-lg font-semibold text-gray-600 mt-2">จำนวนลูกค้าทั้งหมด</div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center transition-transform hover:scale-105">
+                <div class="text-5xl font-bold text-green-600" id="avg-spending">0.00</div>
+                <div class="text-lg font-semibold text-gray-600 mt-2">ค่าใช้จ่ายเฉลี่ย (บาท)</div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg flex flex-col items-center text-center transition-transform hover:scale-105">
+                <div class="text-5xl font-bold text-yellow-600" id="avg-satisfaction">0.00</div>
+                <div class="text-lg font-semibold text-gray-600 mt-2">คะแนนความพึงพอใจเฉลี่ย</div>
+            </div>
+        </div>
 
-            <!-- Main and right content areas -->
-            <main class="flex-1 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 p-4 md:p-0">
-
-                <!-- Profile content area -->
-                <div id="profile-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">ข้อมูลโปรไฟล์</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h3 class="font-bold text-lg mb-2 text-gray-700">ข้อมูลส่วนตัว</h3>
-                            <p class="text-sm text-gray-600">ชื่อ-นามสกุล: จักริน เถาว์ชาลี</p>
-                            <p class="text-sm text-gray-600">รหัสนักศึกษา: 681540005020-4</p>
-                            <p class="text-sm text-gray-600">คณะ: วิทยาการคอมพิวเตอร์</p>
-                            <p class="text-sm text-gray-600">เบอร์โทรศัพท์: 0970143752</p>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <h3 class="font-bold text-lg mb-2 text-gray-700">ข้อมูลการศึกษา</h3>
-                            <p class="text-sm text-gray-600">ปีการศึกษา: 2567</p>
-                            <p class="text-sm text-gray-600">หน่วยกิตสะสม: 90</p>
-                            <p class="text-sm text-gray-600">เกรดเฉลี่ย: 3.31</p>
-                        </div>
-                    </div>
-                    <div class="mt-6">
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">ฟังก์ชันและเครื่องมือ</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <button class="bg-yellow-500 text-white p-4 rounded-lg shadow-md hover:bg-yellow-600 transition-colors" data-section="timetable">ดูตารางเรียน</button>
-                        </div>
-                    </div>
+        <!-- Charts and Graphs -->
+        <div class="dashboard-container">
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4">จำนวนลูกค้าตามแพลตฟอร์มที่ต้องการ</h2>
+                <div class="chart-container">
+                    <canvas id="platformChart"></canvas>
                 </div>
-
-                <!-- Results content area (hidden by default) -->
-                <div id="results-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">ผลการเรียน</h2>
-                    <div class="flex justify-center">
-                       <!-- This section is left empty for future content like a transcript or grade report -->
-                    </div>
+            </div>
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4">การใช้จ่ายเฉลี่ยตามหมวดหมู่สินค้า</h2>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
                 </div>
-
-                <!-- Timetable content area (hidden by default) -->
-                <div id="timetable-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">ตารางเรียน</h2>
-                    <div class="flex justify-center">
-                        <img src="https://i.postimg.cc/YCXkyh6N/Untitled.png" alt="ตารางเรียน" class="rounded-lg shadow-md cursor-pointer">
-                    </div>
+            </div>
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4">คะแนนความพึงพอใจตามอายุ</h2>
+                <div class="chart-container">
+                    <canvas id="ageSatisfactionChart"></canvas>
                 </div>
-                
-                <!-- Other sections (hidden by default) -->
-                <div id="payments-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">การชำระเงิน</h2>
-                    <p class="text-gray-600">เนื้อหาเกี่ยวกับการชำระเงินจะแสดงที่นี่</p>
+            </div>
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4">จำนวนลูกค้าตามระดับรายได้</h2>
+                <div class="chart-container">
+                    <canvas id="incomeChart"></canvas>
                 </div>
-
-                <div id="activities-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">กิจกรรม</h2>
-                    <p class="text-gray-600">เนื้อหาเกี่ยวกับกิจกรรมจะแสดงที่นี่</p>
+            </div>
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4">จำนวนลูกค้าตามสถานที่</h2>
+                <div class="chart-container">
+                    <canvas id="locationChart"></canvas>
                 </div>
-                
-                <div id="notifications-section" class="flex-1 bg-white shadow-lg p-6 rounded-xl hidden">
-                    <h2 class="text-2xl font-semibold text-gray-900 mb-4">การแจ้งเตือน</h2>
-                    <div class="space-y-4">
-                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-red-500">
-                            <p class="font-medium text-gray-800">การชำระเงินล่าช้า: ค่าเทอมงวดที่ 2</p>
-                            <p class="text-sm text-gray-500">ครบกำหนดวันที่ 30 กันยายน 2567</p>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                            <p class="font-medium text-gray-800">กิจกรรมใหม่: สัมมนา AI และอนาคต</p>
-                            <p class="text-sm text-gray-500">ลงทะเบียนได้ตั้งแต่วันนี้!</p>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-yellow-500">
-                            <p class="font-medium text-gray-800">โปรดอัปเดตข้อมูลที่อยู่</p>
-                            <p class="text-sm text-gray-500">ข้อมูลของคุณยังไม่สมบูรณ์</p>
-                        </div>
-                    </div>
-                </aside>
-            </main>
+            </div>
+            <div class="card">
+                <h2 class="text-xl font-semibold mb-4">การกระจายตัวของคะแนนความพึงพอใจ</h2>
+                <div class="chart-container">
+                    <canvas id="satisfactionScoreChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Modal for displaying the image -->
-    <div id="myModal" class="modal">
-        <span class="close">&times;</span>
-        <img class="modal-content" id="img01">
-    </div>
-
     <script>
-        // Get the modal
-        const modal = document.getElementById("myModal");
-        const modalImg = document.getElementById("img01");
-        const myImg = document.getElementById("myImg");
+        // Define charts and data
+        let platformChart, categoryChart, ageSatisfactionChart, incomeChart, locationChart, satisfactionScoreChart;
+        let originalData = [];
 
-        myImg.onclick = function(){
-            modal.style.display = "flex";
-            modalImg.src = this.src;
-        }
-
-        // Get the <span> element that closes the modal
-        const span = document.getElementsByClassName("close")[0];
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-          modal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal content, close it
-        window.onclick = function(event) {
-          if (event.target == modal) {
-            modal.style.display = "none";
-          }
-        }
-
-        // Section management
-        const sections = {
-            'profile': document.getElementById('profile-section'),
-            'results': document.getElementById('results-section'),
-            'timetable': document.getElementById('timetable-section'),
-            'payments': document.getElementById('payments-section'),
-            'activities': document.getElementById('activities-section'),
-            'notifications': document.getElementById('notifications-section')
-        };
-        const navLinks = document.querySelectorAll('nav ul li a');
-        const timetableBtn = document.querySelector('[data-section="timetable"]');
-
-        function showSection(sectionId) {
-            for (const id in sections) {
-                if (sections[id]) {
-                    if (id === sectionId) {
-                        sections[id].classList.remove('hidden');
-                    } else {
-                        sections[id].classList.add('hidden');
-                    }
+        // Function to parse CSV from a URL
+        async function loadDataFromUrl(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('ไม่สามารถโหลดข้อมูลจาก URL ที่ระบุได้ กรุณาตรวจสอบลิงก์');
                 }
+                const csvText = await response.text();
+                return new Promise((resolve, reject) => {
+                    Papa.parse(csvText, {
+                        header: true,
+                        dynamicTyping: true,
+                        complete: (results) => {
+                            resolve(results.data);
+                        },
+                        error: (error) => {
+                            reject(error);
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+                return [];
             }
         }
 
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                event.preventDefault();
-                const sectionId = this.getAttribute('data-section');
-                showSection(sectionId);
-
-                // Update active link styling
-                navLinks.forEach(l => l.classList.remove('bg-blue-50', 'text-blue-700'));
-                this.classList.add('bg-blue-50', 'text-blue-700');
-            });
-        });
-
-        // Set up the click event for the "ดูตารางเรียน" button
-        if (timetableBtn) {
-            timetableBtn.addEventListener('click', function(event) {
-                event.preventDefault();
-                showSection('timetable');
-                // Also update the active link in the sidebar
-                navLinks.forEach(l => l.classList.remove('bg-blue-50', 'text-blue-700'));
-                document.querySelector('nav ul li a[data-section="profile"]').classList.add('bg-blue-50', 'text-blue-700');
-            });
+        // Handle load button click
+        async function handleLoadButtonClick() {
+            const url = document.getElementById('google-sheet-url-input').value;
+            if (url) {
+                originalData = await loadDataFromUrl(url);
+                if (originalData.length > 0) {
+                    populateFilters(originalData);
+                    renderDashboard(originalData);
+                } else {
+                    // Clear dashboard if no data is loaded
+                    renderDashboard([]);
+                }
+            } else {
+                alert('กรุณากรอก Google Sheet URL.');
+            }
         }
 
-        // Initially show the profile section
-        document.addEventListener('DOMContentLoaded', () => {
-            showSection('profile');
-            document.querySelector('nav ul li a[data-section="profile"]').classList.add('bg-blue-50', 'text-blue-700');
-        });
+        // Populate filter dropdowns
+        function populateFilters(data) {
+            const platformFilter = document.getElementById('platform-filter');
+            const locationFilter = document.getElementById('location-filter');
+            const categoryFilter = document.getElementById('category-filter');
 
-        // Modal for the timetable image
-        const timetableImageInTimetableSection = document.querySelector('#timetable-section img');
-        if (timetableImageInTimetableSection) {
-            timetableImageInTimetableSection.onclick = function() {
-                modal.style.display = "flex";
-                modalImg.src = this.src;
-            };
+            // Clear previous options
+            platformFilter.innerHTML = '<option value="ทั้งหมด">ทั้งหมด</option>';
+            locationFilter.innerHTML = '<option value="ทั้งหมด">ทั้งหมด</option>';
+            categoryFilter.innerHTML = '<option value="ทั้งหมด">ทั้งหมด</option>';
+
+            const platforms = [...new Set(data.map(item => item.preferred_platform))].filter(p => p);
+            const locations = [...new Set(data.map(item => item.location))].filter(l => l);
+            const categories = [...new Set(data.map(item => item.product_category))].filter(c => c);
+
+            platforms.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p;
+                option.textContent = p;
+                platformFilter.appendChild(option);
+            });
+
+            locations.forEach(l => {
+                const option = document.createElement('option');
+                option.value = l;
+                option.textContent = l;
+                locationFilter.appendChild(option);
+            });
+
+            categories.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c;
+                option.textContent = c;
+                categoryFilter.appendChild(option);
+            });
+
+            // Add event listeners only once
+            platformFilter.addEventListener('change', applyFilters);
+            locationFilter.addEventListener('change', applyFilters);
+            categoryFilter.addEventListener('change', applyFilters);
         }
+
+        // Apply filters to data and re-render
+        function applyFilters() {
+            const selectedPlatform = document.getElementById('platform-filter').value;
+            const selectedLocation = document.getElementById('location-filter').value;
+            const selectedCategory = document.getElementById('category-filter').value;
+
+            let filteredData = originalData;
+
+            if (selectedPlatform !== 'ทั้งหมด') {
+                filteredData = filteredData.filter(item => item.preferred_platform === selectedPlatform);
+            }
+            if (selectedLocation !== 'ทั้งหมด') {
+                filteredData = filteredData.filter(item => item.location === selectedLocation);
+            }
+            if (selectedCategory !== 'ทั้งหมด') {
+                filteredData = filteredData.filter(item => item.product_category === selectedCategory);
+            }
+
+            renderDashboard(filteredData);
+        }
+
+        // Function to render the dashboard with data
+        function renderDashboard(data) {
+            // Clear existing charts
+            if (platformChart) platformChart.destroy();
+            if (categoryChart) categoryChart.destroy();
+            if (ageSatisfactionChart) ageSatisfactionChart.destroy();
+            if (incomeChart) incomeChart.destroy();
+            if (locationChart) locationChart.destroy();
+            if (satisfactionScoreChart) satisfactionScoreChart.destroy();
+
+            // Calculate key metrics
+            document.getElementById('total-customers').textContent = data.length.toLocaleString();
+            const totalSpending = data.reduce((sum, item) => sum + (item.avg_spending || 0), 0);
+            const avgSpending = data.length > 0 ? (totalSpending / data.length).toFixed(2) : '0.00';
+            document.getElementById('avg-spending').textContent = avgSpending;
+            const totalSatisfaction = data.reduce((sum, item) => sum + (item.satisfaction_score || 0), 0);
+            const avgSatisfaction = data.length > 0 ? (totalSatisfaction / data.length).toFixed(2) : '0.00';
+            document.getElementById('avg-satisfaction').textContent = avgSatisfaction;
+
+            // If no data, stop here
+            if (data.length === 0) return;
+
+            // --- Chart Data Preparation ---
+
+            // Chart 1: Preferred Platform
+            const platformCounts = data.reduce((acc, item) => {
+                acc[item.preferred_platform] = (acc[item.preferred_platform] || 0) + 1;
+                return acc;
+            }, {});
+            const platformLabels = Object.keys(platformCounts);
+            const platformData = Object.values(platformCounts);
+            const platformColors = ['#4F46E5', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#22C55E', '#EC4899', '#3B82F6', '#EF4444'];
+
+            const ctx1 = document.getElementById('platformChart').getContext('2d');
+            platformChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: platformLabels,
+                    datasets: [{
+                        label: 'จำนวนลูกค้า',
+                        data: platformData,
+                        backgroundColor: platformLabels.map((_, i) => platformColors[i % platformColors.length]),
+                        borderColor: platformLabels.map((_, i) => platformColors[i % platformColors.length]),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Chart 2: Average Spending by Category
+            const categorySpending = data.reduce((acc, item) => {
+                acc[item.product_category] = acc[item.product_category] || { sum: 0, count: 0 };
+                acc[item.product_category].sum += item.avg_spending || 0;
+                acc[item.product_category].count += 1;
+                return acc;
+            }, {});
+            const categoryLabels = Object.keys(categorySpending);
+            const avgSpendingData = categoryLabels.map(category => categorySpending[category].sum / categorySpending[category].count);
+
+            const ctx2 = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        data: avgSpendingData,
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#22C55E', '#EC4899', '#4F46E5'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+
+            // Chart 3: Satisfaction Score by Age
+            const ageSatisfaction = data.reduce((acc, item) => {
+                if (item.age) {
+                    let ageGroup;
+                    if (item.age < 25) ageGroup = '18-24';
+                    else if (item.age < 35) ageGroup = '25-34';
+                    else if (item.age < 45) ageGroup = '35-44';
+                    else ageGroup = '45+';
+                    acc[ageGroup] = acc[ageGroup] || { sum: 0, count: 0 };
+                    acc[ageGroup].sum += item.satisfaction_score || 0;
+                    acc[ageGroup].count += 1;
+                }
+                return acc;
+            }, {});
+            const ageSatisfactionLabels = Object.keys(ageSatisfaction).sort();
+            const ageSatisfactionData = ageSatisfactionLabels.map(group => ageSatisfaction[group].sum / ageSatisfaction[group].count);
+
+            const ctx3 = document.getElementById('ageSatisfactionChart').getContext('2d');
+            ageSatisfactionChart = new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: ageSatisfactionLabels,
+                    datasets: [{
+                        label: 'คะแนนความพึงพอใจเฉลี่ย',
+                        data: ageSatisfactionData,
+                        borderColor: '#4F46E5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: 'คะแนนความพึงพอใจ'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Chart 4: Income Level Distribution
+            const incomeCounts = data.reduce((acc, item) => {
+                acc[item.income_level] = (acc[item.income_level] || 0) + 1;
+                return acc;
+            }, {});
+            const incomeLabels = ['Low', 'Medium', 'High'];
+            const incomeData = incomeLabels.map(level => incomeCounts[level] || 0);
+
+            const ctx4 = document.getElementById('incomeChart').getContext('2d');
+            incomeChart = new Chart(ctx4, {
+                type: 'doughnut',
+                data: {
+                    labels: incomeLabels,
+                    datasets: [{
+                        data: incomeData,
+                        backgroundColor: ['#EF4444', '#F59E0B', '#10B981'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+
+            // Chart 5: Customer by Location
+            const locationCounts = data.reduce((acc, item) => {
+                acc[item.location] = (acc[item.location] || 0) + 1;
+                return acc;
+            }, {});
+            const locationLabels = Object.keys(locationCounts);
+            const locationData = Object.values(locationCounts);
+            const locationColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1', '#22C55E', '#EC4899', '#4F46E5'];
+
+            const ctx5 = document.getElementById('locationChart').getContext('2d');
+            locationChart = new Chart(ctx5, {
+                type: 'bar',
+                data: {
+                    labels: locationLabels,
+                    datasets: [{
+                        label: 'จำนวนลูกค้า',
+                        data: locationData,
+                        backgroundColor: locationLabels.map((_, i) => locationColors[i % locationColors.length]),
+                        borderColor: locationLabels.map((_, i) => locationColors[i % locationColors.length]),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Chart 6: Satisfaction Score Distribution
+            const satisfactionCounts = data.reduce((acc, item) => {
+                const score = Math.round(item.satisfaction_score); // Group by integer score
+                acc[score] = (acc[score] || 0) + 1;
+                return acc;
+            }, {});
+            const satisfactionLabels = Object.keys(satisfactionCounts).sort((a, b) => a - b);
+            const satisfactionData = satisfactionLabels.map(score => satisfactionCounts[score]);
+
+            const ctx6 = document.getElementById('satisfactionScoreChart').getContext('2d');
+            satisfactionScoreChart = new Chart(ctx6, {
+                type: 'polarArea',
+                data: {
+                    labels: satisfactionLabels,
+                    datasets: [{
+                        data: satisfactionData,
+                        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Add event listener for the load button and trigger on page load
+        window.onload = () => {
+          document.getElementById('load-data-button').addEventListener('click', handleLoadButtonClick);
+          handleLoadButtonClick(); // Automatically load data from the default URL
+        };
     </script>
 </body>
 </html>
