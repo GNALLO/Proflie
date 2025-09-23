@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Jakkarin Thaochalee</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-image: url('https://images.pexels.com/photos/413195/pexels-photo-413195.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* --- การ์ดโปรไฟล์ --- */
+        .profile-card {
+            /* VVV แก้ไขตรงนี้ให้ใสขึ้น VVV */
+            background-color: rgba(255, 255, 255, 0.6); /* ลดความทึบลง */
+            backdrop-filter: blur(10px); /* เพิ่มความเบลอเพื่อให้อ่านง่าย */
+
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            padding: 40px 30px;
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- รูปโปรไฟล์ --- */
+        .profile-image img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+        }
+
+        /* --- ข้อมูลโปรไฟล์ --- */
+        .profile-info h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            color: #2c3e50; /* ปรับสีตัวอักษรให้เข้มขึ้นเล็กน้อยเพื่อการมองเห็น */
+        }
+        
+        .profile-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: #34495e; /* ปรับสีตัวอักษรให้เข้มขึ้นเล็กน้อย */
+            text-align: left;
+        }
+
+        .profile-info li {
+            margin-bottom: 12px;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- สไตล์ไอคอน --- */
+        .profile-info .icon {
+            color: #2980b9; /* ปรับสีไอคอน */
+            width: 30px;
+            text-align: center;
+            font-size: 1.1em;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="profile-card">
+        
+        <div class="profile-image">
+            <img src="dd.jpg" alt="Profile Image">
+        </div>
+        
+        <div class="profile-info">
+            <h1>Mr. Jakkarin Thaochalee</h1>
+            <ul>
+                <li>
+                    <i class="fas fa-envelope icon"></i>
+                    <span>runleanee@gmail.com</span>
+                </li>
+                <li>
+                    <i class="fas fa-desktop icon"></i>
+                    <span>Department: Computer Engineering</span>
+                </li>
+                <li>
+                    <i class="fas fa-building-columns icon"></i>
+                    <span>Faculty: Engineering and Industrial Technology</span>
+                </li>
+            </ul>
+        </div>
+        
+    </div>
+    
+</body>
+</html>
